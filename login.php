@@ -16,10 +16,16 @@ if ($conn->connect_error) {
 $email = $password = "";
 $email_err = $password_err = "";
 
-// Check if the user is already logged in
+// Start session
 session_start();
+
+// Check if the user is already logged in
 if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true) {
-    header("location: welcome.php");
+    if ($_SESSION["role_id"] == 1) {
+        header("location:admin.php");
+    } else {
+        header("location:welcome.php");
+    }
     exit;
 }
 
@@ -49,6 +55,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $stmt->bind_result($id, $email, $hashed_password, $role_id);
                     if ($stmt->fetch()) {
                         if (password_verify($password, $hashed_password)) {
+                            // Start a new session
+                            session_start();
                             $_SESSION["loggedin"] = true;
                             $_SESSION["id"] = $id;
                             $_SESSION["email"] = $email;
